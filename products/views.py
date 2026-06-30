@@ -9,26 +9,32 @@ from django.core.exceptions import PermissionDenied
 
 class IndexView(generic.ListView):
     model = Products
-    template_name = 'bbs/index.html'
+    template_name = 'products/index.html'
 
 class DetailView(generic.DetailView):
     model = Products
-    template_name = 'bbs/detail.html'
+    template_name = 'products/detail.html'
 
 class CreateView(LoginRequiredMixin, generic.edit.CreateView):
     model = Products
-    template_name = 'bbs/create.html'
-    fields = ['title','content','price',]
+    template_name = 'products/create.html'
+    fields = ['title', 'content', 'price', 'image']
+    success_url = reverse_lazy('products:index')
 
-    def form_valid(self, form): # バリテーション通過時に呼び出し
-        form.instance.author = self.request.user # authorにログインユーザーを渡す
-        return super(CreateView, self).form_valid(form) # クラスのメソッド呼び出し
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        return super().form_valid(form)
+    
+    def post(self, request, *args, **kwargs):
+        print("FILES:", request.FILES)
+        return super().post(request, *args, **kwargs)
     
 
 class UpdateView(LoginRequiredMixin,generic.edit.UpdateView):
     model = Products
-    template_name = 'bbs/create.html'
+    template_name = 'products/create.html'
     fields = ['content']
+    success_url = reverse_lazy('products:index')
 
     def dispatch(self, request, *args, **kwargs):
         obj = self.get_object()
@@ -42,7 +48,7 @@ def custom_permission_denied_view(request, exception):
 
 class DeleteView(LoginRequiredMixin,generic.edit.DeleteView):
     model = Products
-    template_name= 'bbs/delete.html'
+    template_name= 'products/delete.html'
     success_url = reverse_lazy('bbs:index') #フォームが正常に送信のリダイレクト先
 
     def dispatch(self, request, *args, **kwargs):
@@ -53,11 +59,11 @@ class DeleteView(LoginRequiredMixin,generic.edit.DeleteView):
 
 
 def search(request):
-    articles = None
+    productss = None
     searchform = SearchForm(request.GET)
 
     if searchform.is_valid():
         query = searchform.cleaned_data['words']
-        articles = Products.objects.filter(content__icontains=query)
+        productss = Products.objects.filter(title__icontains=query)
 
-    return render(request, 'bbs/results.html', {'articles':articles,'searchform':searchform})
+    return render(request, 'products/results.html', {'productss':productss,'searchform':searchform})

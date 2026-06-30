@@ -24,13 +24,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-_wwtsf9r6xs9!5)j(61wev8#go)s@22awx=lynuret@$pf+l4k'
-
+SECRET_KEY = config('SECRET_KEY')
+# SECRET_KEY= 'qqvclcklbh(ou_+2o)0d6n)!b+hysm1u7y955g=dul992#qr5v'
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = ['*']
-
+DEBUG = config('DEBUG', default=False, cast=bool)
+# DEBUG=True
+ALLOWED_HOSTS = ['https://bbs-project-1.onrender.com', 'localhost', '127.0.0.1']
+# ALLOWED_HOSTS=['*']
 
 # Application definition
 
@@ -40,7 +40,9 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'cloudinary_storage',
     'django.contrib.staticfiles',
+    'cloudinary',
     'bbs.apps.BbsConfig',
     'django_bootstrap5',
     'accounts.apps.AccountsConfig',
@@ -131,3 +133,29 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_REDIRECT_URL = '/bbs/'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+# 本番（DEBUG=False）の時だけ有効化
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True          # HTTPアクセスを自動でHTTPSにリダイレクト
+    SESSION_COOKIE_SECURE = True        # セッションクッキーをHTTPS通信のみで送信
+    CSRF_COOKIE_SECURE = True           # CSRFクッキーをHTTPS通信のみで送信
+    SECURE_HSTS_SECONDS = 60 * 60 * 24 * 30   # 30日間、ブラウザにHTTPS強制を指示(HSTS)
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+
+import cloudinary
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': config('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': config('CLOUDINARY_API_KEY'),
+    'API_SECRET': config('CLOUDINARY_API_SECRET'),
+}
+cloudinary.config(
+    cloud_name=config('CLOUDINARY_CLOUD_NAME'),
+    api_key=config('CLOUDINARY_API_KEY'),
+    api_secret=config('CLOUDINARY_API_SECRET'),
+)
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'

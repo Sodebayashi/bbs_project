@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 {% block content %}
   <h1 class="mt-5">検索結果：</h1>
-  {% if articles %}
-    {% for article in articles %}
+  {% if productss %}
+    {% for products in productss %}
       <div class="card bg-light shadow-sm mt-3">
 	        <div class="card-body">
           <p>{{ products.id }}:{{ products.author }}:{{ products.created_at }}</p>
-          <p><a href="{% url 'bbs:detail' products.id %}">{{ products.content }}</a></p>
+          <p><a href="{% url 'products:detail' products.id %}">{{ products.content }}</a></p>
         </div>
       </div>
     {% endfor %}

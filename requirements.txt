@@ -7,3 +7,5 @@ gunicorn
 psycopg2-binary
 whitenoise
 django-bootstrap5
+cloudinary
+django-cloudinary-storage
