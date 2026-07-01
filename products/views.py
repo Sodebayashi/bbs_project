@@ -23,8 +23,14 @@ class CreateView(LoginRequiredMixin, generic.edit.CreateView):
 
     def form_valid(self, form):
         form.instance.author = self.request.user
-        return super().form_valid(form)
-    
+
+        try:
+            return super().form_valid(form)
+        except Exception:
+            import traceback
+            traceback.print_exc()
+            raise
+        
     def post(self, request, *args, **kwargs):
         print("FILES:", request.FILES)
         return super().post(request, *args, **kwargs)
