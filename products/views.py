@@ -1,3 +1,4 @@
+from django.http import HttpResponse
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views import generic
@@ -21,15 +22,14 @@ class CreateView(LoginRequiredMixin, generic.edit.CreateView):
     fields = ['title', 'content', 'price', 'image']
     success_url = reverse_lazy('products:index')
 
+
     def form_valid(self, form):
         form.instance.author = self.request.user
 
         try:
             return super().form_valid(form)
-        except Exception:
-            import traceback
-            traceback.print_exc()
-            raise
+        except Exception as e:
+            return HttpResponse(f"<pre>{type(e).__name__}: {e}</pre>", status=500)
         
     def post(self, request, *args, **kwargs):
         print("FILES:", request.FILES)
